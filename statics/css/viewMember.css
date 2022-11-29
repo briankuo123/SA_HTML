@@ -1,0 +1,236 @@
+body {
+    font-family:Arial, Helvetica, sans-serif;
+    background-color: rgb(224, 224, 224);
+  }
+  
+  .navbar {
+      background-color: #333;
+  }
+  
+  .left_div {
+      display:flex;
+      align-items: center;
+  }
+  
+  .right_div {
+      display: flex;
+      position: absolute;
+      right: 0;
+      top: 0;
+  }
+    
+  .logo {
+      float: left;
+      font-size: 50px;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      line-height: 45px;
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif ;
+	  cursor:pointer;
+  }
+  
+  #search {
+      float: left;
+      text-decoration: none;
+      font-size: 25px;
+      border-radius: 5px;
+  }
+  
+  #search_button{
+    position: relative;
+    left: 10px;
+    border-radius: 5px;
+    width: 60px;
+    height: 35px;
+    background-color: #333;
+    font-weight: bold;
+    border-color: #3dc905;
+    border-width: 3px;
+    color: #3dc905;
+	cursor:pointer;
+  }
+  
+    /* Links inside the navbar */
+    .right {
+      font-size: 20px;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      width: 60px;
+      height: 45px;
+      line-height: 45px;
+    }
+  
+    .right:hover {
+      background-color: rgb(129, 129, 129);
+    }
+  
+    .right_div .dropbtn {
+      font-size: 20px;
+      border: none;
+      outline: none;
+      color: white;
+      padding: 14px 16px;
+      background-color: inherit;
+      margin: 0;
+      line-height: 45px;
+    }
+  
+    .right_div .dropbtn:hover {
+      background-color: rgb(129, 129, 129);
+    }
+  
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+  
+    .dropdown-content a {
+      float: none;
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      text-align: left;
+    }
+  
+    .dropdown-content a:hover {
+      background-color: #ddd;
+    }
+  
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+	
+	#account_table {
+		border:5px;
+		border-radius:5px;
+    margin: 0px;
+	}
+	
+	.sort {
+		cursor:pointer;
+	}
+	
+	.info {
+		cursor:pointer;
+	}
+	.delete {
+		cursor:pointer;
+	}
+	
+	.view {
+		cursor:pointer;
+		border-radius:15px 0px 0px 15px;
+	}
+	
+	.page_button {
+		border:none;
+		width:50px;
+		height:45px;
+		padding:0px;
+		border-radius:5px;
+		cursor:pointer;
+	}
+	
+	#filter {
+      text-decoration: none;
+      font-size: 35px;
+      border-radius: 5px;
+	}
+	
+	.info_btn {
+		border:none;
+		width:25px;
+		height:25px;
+		padding:0px;
+		border-radius:5px;
+		cursor:pointer;
+	}
+	
+	.delete_btn {
+		border:none;
+		width:25px;
+		height:25px;
+		padding:0px;
+		border-radius:5px;
+		cursor:pointer;
+	}
+	
+	button:hover{
+		background-color:rgba(54, 54, 54, 0.2);
+	}
+
+  #all {
+    display: flex;
+    flex-direction: column;
+    margin:3% 20% 10px;
+  }
+
+  #table_up_area {
+    display: flex;
+    position: relative;
+    margin: 10px 0px;
+      
+  }
+
+  #table_up_area button {
+    border: none;
+    width: 80px;
+    height: 30px;
+    margin: 0px 10px 0px 0px;
+    padding: 0px;
+    border-radius: 5px;
+  }
+
+  #table_up_area input {
+    font-size: 18px;
+    padding: 2px;
+    border-radius: 5px;
+    margin-right: 5px;
+  }
+
+  td {
+    padding: 10px;
+  }
+
+  td button {
+    border: none;
+    width: 80px;
+    height: 30px;
+    margin: 0px;
+    padding: 0px;
+    border-radius: 5px;
+    background-color: red;
+  }
+
+  td button:hover {
+    background-color: rgb(214, 0, 0);
+  }
+
+  #table_up_area #people_search {
+    border: none;
+    width: 30px;
+    height: 30px;
+    margin: 0px;
+    padding: 0px;
+    border-radius: 5px;
+    position: relative;
+  }
+
+  #table_up_area #people_search:hover {
+    transform: scale(1.2, 1.2);
+  }
+
+  img {
+    overflow: hidden;
+    border-radius: 5px;
+  }
+  

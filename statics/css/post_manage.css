@@ -1,0 +1,194 @@
+body {
+    font-family:Arial, Helvetica, sans-serif;
+  }
+  
+  .navbar {
+      background-color: #333;
+  }
+  
+  .left_div {
+      display:flex;
+      align-items: center;
+  }
+  
+  .right_div {
+      display: flex;
+      position: absolute;
+      right: 0;
+      top: 0;
+  }
+    
+  .logo {
+      float: left;
+      font-size: 50px;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      line-height: 45px;
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif ;
+  }
+  
+  #search {
+      float: left;
+      text-decoration: none;
+      font-size: 25px;
+      border-radius: 5px;
+  }
+  
+  #search_button{
+    position: relative;
+    left: 10px;
+    border-radius: 5px;
+    width: 60px;
+    height: 35px;
+    background-color: #333;
+    font-weight: bold;
+    border-color: #3dc905;
+    border-width: 3px;
+    color: #3dc905;
+  }
+  
+    /* Links inside the navbar */
+    .right {
+      font-size: 20px;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      width: 60px;
+      height: 45px;
+      line-height: 45px;
+    }
+  
+    .right:hover {
+      background-color: rgb(129, 129, 129);
+    }
+  
+    .right_div .dropbtn {
+      font-size: 20px;
+      border: none;
+      outline: none;
+      color: white;
+      padding: 14px 16px;
+      background-color: inherit;
+      margin: 0;
+      line-height: 45px;
+    }
+  
+    .right_div .dropbtn:hover {
+      background-color: rgb(129, 129, 129);
+    }
+  
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+  
+    .dropdown-content a {
+      float: none;
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      text-align: left;
+    }
+  
+    .dropdown-content a:hover {
+      background-color: #ddd;
+    }
+  
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    #post_manage_div {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; 
+        margin: 10px 20%;
+        position: relative;
+    }
+
+    #post_manage_div #top_title{
+        font-weight: bold;
+        font-size: 36px;
+    }
+    
+    .post_manage_box {
+        display: inline;
+        position: relative;
+    }
+
+    .post_manage_box .post_manage_info {
+        position: absolute;
+        top: 50%;
+        left: 8%;
+    }
+
+    .post_manage_info .post_name {
+        font-size: 25px;
+        text-decoration: none;
+        color: black;
+    }
+
+    .post_manage_info .time {
+        font-size: 15px;
+    }
+
+    .post_manage_box .post_manage_button {
+        display: inline;
+        position: absolute;
+        right: 1%;
+        top: 50%;
+    }
+    
+    .post_manage_box .post_manage_button button {
+        border: none;
+        width: 80px;
+        height: 30px;
+        margin: 0px;
+        padding: 0px;
+        border-radius: 5px;
+    }
+
+    .post_manage_box .post_manage_button button:hover {
+        background-color: rgba(54, 54, 54, 0.2);
+    }
+
+    hr {
+        border: 0;
+        clear:both;
+        display:block;
+        width: 100%;               
+        background-color:rgb(77, 77, 77);
+        height: 3px;
+    }
+
+    #upload_post {
+        border: none;
+        width: 80px;
+        height: 30px;
+        margin: 0px;
+        padding: 0px;
+        border-radius: 5px;
+    }
+
+    #post_top {
+      display: inline;
+      position: relative;
+    }
+
+    #post_top button {
+      position: absolute;
+      right: 1%;
+      bottom: 10%;
+    }
+
+    #post_top button:hover {
+      background-color: rgba(54, 54, 54, 0.2);
+    }

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EroPic</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <link href="statics/css/post_manage.css" rel="stylesheet">
+        <script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    </head>
+    <body style="margin:0px">
+        <div class="navbar">
+          <div class="left_div">
+            <a class="logo" href="index_manager.html">EroPic</a>
+            <input type="search" id="search" aria-label="Search through site content" size="30">
+            <button id="search_button" type="submit" onclick="getSearch()">Search</button>
+          </div>
+          <div class="right_div">
+            <a class="right" href="sub_manager.html"><img src="statics/icon/subscribe.png" width="50" height="45"></a>
+            <a class="right" href="rank"><img src="statics/icon/podium.png" width="50" height="45"></a>
+            <div class="dropdown">
+              <button class="dropbtn" id="nickname">
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <div class="dropdown-content">
+                <a href="personal_profile_manager.html">Personal Profile</a>
+                <a href="post_manage_manager.html">Post Manage</a>
+                <a href="viewMember.html">View Member</a>
+                <a href="viewReport.html">View Report</a>
+                <a href="javascript:void(0)" onclick="logout()">Logout</a> 
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="post_manage_div">
+        
+        </div>
+	</body>
+	<script>
+		var id = JSON.parse(sessionStorage.getItem("id"));
+	
+		function getSearch() {
+		  	var search_query = $("#search").val();
+		  	document.location.href = "index_manager.html?search_query=" + search_query;
+		}
+		
+        function getMemberPost() {
+            $.ajax({
+              type: "GET",
+              url: "api/Post.do",
+              crossDomain: true,
+              data: "member_id=" + id,
+              cache: false,
+              dataType: 'json',
+              timeout: 5000,
+              success: function (response) {
+              	if (response.status == 200) {
+	          		var post_panel = '';
+	          		updateTable();
+	          		
+	              	$.each(response.response.data, function() {
+	              		post_panel += addPost(this);
+	              	})
+	              	
+	              	$("#post_manage_div").append(post_panel);
+	              	$("#post_manage_div").append(addPostFoot());
+	            }
+	          },
+	          error: function () {
+	          	alert("無法連線到伺服器！");
+	          }
+           });
+        }
+        
+        function updateTable() {
+			$("#post_manage_div").empty();
+        	
+        	let inner_html = '';
+             
+         	inner_html += '<div id="post_top">';
+        	inner_html += '<a id="top_title">Post Manage</a>';
+        	inner_html += '<button id="upload_post" onclick="uploadPost()">Upload</button>';
+            inner_html += '</div>';
+            inner_html += '<hr>';
+            
+            $("#post_manage_div").append(inner_html);
+        }
+        
+        function addPost (data) {
+            let inner_html = '';
+            
+        	inner_html += '<div class="post_manage_box">';
+       		inner_html += '<a href="post.html?post_id=' + data.id + '"><img src="' + data.image + '" width="7%" height="7%"></a>';
+            inner_html += '<div class="post_manage_info">';
+            inner_html += '<a class="post_name" href="post.html?post_id=' + data.id + '"><b>' + data.title + '</b></a>';
+     		inner_html += '<a class="time">' + data.create + '</a>';
+     		inner_html += '</div>';
+     		inner_html += '<div class="post_manage_button">';
+    		inner_html += '<button type="button" onclick="editPost(' + data.id + ')">Edit</button>';
+    		inner_html += '<button type="button" onclick="deletePost(' + data.id + ')">Delete</button>';
+    		inner_html += '</div>';
+    		inner_html += '</div>';
+       		inner_html += '<br><hr>';
+        	
+    		return inner_html;
+        }
+        
+        function addPostFoot() {
+            let inner_html = '';
+            
+            inner_html += '<br><h3 align="center">無更多資料...</h3><br>';
+        	
+    		return inner_html;
+        }
+        
+        function editPost(post_id) {
+        	document.location.href = "edit_post.html?post_id=" + post_id;
+        }
+        
+        function uploadPost() {
+        	document.location.href = "upload_post.html";
+        }
+        
+        function deletePost(post_id) {
+            var check = window.confirm("確認刪除該貼文？");
+            if (check == true) {
+                console.log("You pressed OK!");
+                var request = {'id': post_id};
+                var data_string = JSON.stringify(request);
+                $.ajax({
+                    type: "DELETE",
+                    url: "api/Post.do",
+                    crossDomain: true,
+                    data: data_string,
+                    cache: false,
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function (response) {
+                        if(response.status == 200){
+                        	alert("成功刪除貼文！");
+                        	getMemberPost();
+                        }
+                    },
+                    error: function () {
+                        alert("無法連線到伺服器！");
+                    }
+                });
+            }
+            else {
+                console.log("You pressed Cancel!");
+            }
+        }
+        
+		function logout(){
+		    sessionStorage.removeItem("id");
+		    alert("成功登出！");
+		    document.location.href = "index.html";
+	    }
+		
+		function getMember() {
+	        $.ajax({
+	            type: "GET",
+	            url: "api/member.do",
+	            crossDomain: true,
+	            data: "id=" + id,
+	            cache: false,
+	            dataType: 'json',
+	            timeout: 5000,
+	            success: function (response) {
+	                if(response.status == 200){
+	                	document.getElementById('nickname').innerHTML = response['response']['data'][0]['nickname'];
+	                }
+	                console.log(response);
+	            },
+	            error: function () {
+	                alert("無法連線到伺服器！");
+	            }
+	        });
+	    }
+	    
+	    $(document).ready(function() {
+	    	// 發出GET的AJAX請求取得原本該會員的資料
+	        getMember();
+	    	getMemberPost();
+	    });
+	</script>
+</html>

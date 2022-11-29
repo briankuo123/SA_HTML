@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Management | EroPic</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <link href="statics/css/viewReport.css" rel="stylesheet">
+		<script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    </head>
+    <body style="margin:0px">
+        <div class="navbar">
+          <div class="left_div">
+            <a class="logo" href="index_manager.html">EroPic</a>
+            <input type="search" id="search" aria-label="Search through site content" size="30">
+            <button id="search_button" type="submit" onclick="getSearch()">Search</button>
+          </div>
+          <div class="right_div">
+            <a class="right" href="sub_manager.html"><img src="statics/icon/subscribe.png" width="50" height="45"></a>
+            <a class="right" href="rank"><img src="statics/icon/podium.png" width="50" height="45"></a>
+            <div class="dropdown">
+              <button class="dropbtn" id="nickname">
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <div class="dropdown-content">
+                <a href="personal_profile_manager.html">Personal Profile</a>
+                <a href="post_manage_manager.html">Post Manage</a>
+                <a href="viewMember.html">View Member</a>
+                <a href="viewReport.html">View Report</a>
+                <a href="javascript:void(0)" onclick="logout()">Logout</a> 
+              </div>
+            </div>
+          </div>
+        </div>
+		<div class="table_div" style="margin-bottom:5%;margin-left:5%;">
+		
+			<div id="table_up_area">
+				<h1 align="center">以下為所有檢舉內容</h1>
+			</div>
+			
+			<table id="report_table" bgcolor="white" width="95%" cellspacing="0">
+				<thead>
+					<tr bgcolor="#333" style="color:white" align="center">
+						<th>檢舉單編號</th><th>檢舉人編號</th><th class="sort">貼文編號</th><th class="sort">查看貼文</th><th class="sort">檢舉時間</th><th class="sort">原因</th><th  class="sort">狀態</th><th>動作</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			<hr>
+			<div id="table_foot">
+			</div>
+		</div>
+	</body>
+	<script>
+		var id = JSON.parse(sessionStorage.getItem("id"));
+		
+		function getSearch() {
+		  	var search_query = $("#search").val();
+		  	document.location.href = "index_manager.html?search_query=" + search_query;
+		}
+		
+	    function getAllReport() {
+	        $.ajax({
+	          type: "GET",
+	          url: "api/report.do",
+	          crossDomain: true,
+	          cache: false,
+	          dataType: 'json',
+	          timeout: 5000,
+	          success: function (response) {
+	            if (response.status == 200) {
+	    	    	$("#report_table > tbody").empty();
+	    	    	$("#table_foot").empty();
+		          	var report_panel = '';
+		          	
+		          	$.each(response.response.data, function() {
+		          		report_panel += addReport(this);
+		          	})
+		          	
+		          	$("#report_table").append(report_panel);
+		          	$("#table_foot").append(addReportFoot());
+	            }
+	          },
+	          error: function () {
+	            alert("無法連線到伺服器！");
+	          }
+	       });
+	    }
+	    
+	    function addReport (data) {
+	        let inner_html = '';
+	        
+	    	inner_html += '<tr class="row" align="center">';
+	   		inner_html += '<td class="id" id="id_' + data.id + '">'+ data.id +'</td>';
+	   		inner_html += '<td>' + data.reporter_id + '</td>';
+	   		inner_html += '<td><span id="postId_' + data.post_id + '"> ' + data.post_id + '</span></td>';
+	   		if(data.status == "待處理"){
+	   			inner_html += '<td><button type="button" onclick="viewPost(' + data.post_id +' )">查看貼文</button></td>';
+	   		}
+	   		else{
+	   			inner_html += '<td>已無法查看</td>';
+	   		}
+	   		inner_html += '<td>' + data.created + '</td>';
+	   		inner_html += '<td>' + data.reason + '</td><td>' + data.status + '</td>';
+	   		if(data.status == "待處理"){
+		   		inner_html += '<td>';
+		   		inner_html += '<button type="button" onclick="checkReport(' + data.id + ')">無違規</button>';
+		   		inner_html += '<button type="button" onclick="deletePost(' + data.post_id + ',' + data.id + ')">刪除貼文</button>';
+		   		inner_html += '<td>';
+	   		}
+	   		else{
+	   			inner_html += '<td>已處理<td>';
+	   		}
+	        inner_html += '</tr>';
+	        
+			return inner_html;
+	    }
+		
+	    function addReportFoot() {
+            let inner_html='';
+            
+            inner_html += '<br><h3 align="center">無更多資料...</h3><br>';
+            
+            return inner_html;
+        }
+	    
+	    function checkReport(report_id) {
+	    	var check = window.confirm("確認判定為無違規？");
+            if (check == true) {
+            	console.log("You pressed OK!");
+            	updateReport(report_id)
+            }
+            else {
+                console.log("You pressed Cancel!");
+            }
+	    }
+	    
+	    function updateReport(report_id) {
+	        // 將資料組成JSON格式
+	        var data_object = {"id": report_id};
+	        var data_string = JSON.stringify(data_object);
+	
+	        // 發出POST的PUT請求
+	        $.ajax({
+	            type: "PUT",
+	            url: "api/report.do",
+	            data: data_string,
+	            crossDomain: true,
+	            cache: false,
+	            dataType: 'json',
+	            timeout: 5000,
+	            success: function (response) {
+	                if(response.status == 200){
+	                    getAllReport();
+	                }
+	            },
+	            error: function () {
+	                alert("無法連線到伺服器！");
+	            }
+	        });
+        }
+	    
+	    function deletePost(post_id, report_id) {
+            var check = window.confirm("確認刪除該貼文？");
+            if (check == true) {
+                console.log("You pressed OK!");
+                var request = {'id': post_id};
+                var data_string = JSON.stringify(request);
+                $.ajax({
+                    type: "DELETE",
+                    url: "api/Post.do",
+                    crossDomain: true,
+                    data: data_string,
+                    cache: false,
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function (response) {
+                        if(response.status == 200){
+                        	alert("成功刪除貼文！");
+                        	updateReport(report_id);
+                            getAllReport();
+                        }
+                    },
+                    error: function () {
+                        alert("無法連線到伺服器！");
+                    }
+                });
+            }
+            else {
+                console.log("You pressed Cancel!");
+            }
+        }
+	    
+	    function viewPost(post_id) {
+	    	document.location.href = "post_manager.html?post_id=" + post_id;
+	    }
+	    
+
+		function logout(){
+		   sessionStorage.removeItem("id");
+		   alert("成功登出！");
+		   document.location.href = "index.html";
+		}
+		
+		function getMember() {
+	        $.ajax({
+	            type: "GET",
+	            url: "api/member.do",
+	            crossDomain: true,
+	            data: "id=" + id,
+	            cache: false,
+	            dataType: 'json',
+	            timeout: 5000,
+	            success: function (response) {
+	                if(response.status == 200){
+	                	document.getElementById('nickname').innerHTML = response['response']['data'][0]['nickname'];
+	                }
+	                console.log(response);
+	            },
+	            error: function () {
+	                alert("無法連線到伺服器！");
+	            }
+	        });
+	    }
+	    
+	    $(document).ready(function() {
+	    	// 發出GET的AJAX請求取得原本該會員的資料
+	        getMember();
+	    	getAllReport();
+	    });
+	</script>
+</html>

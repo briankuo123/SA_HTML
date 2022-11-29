@@ -1,0 +1,114 @@
+body {
+    font-family:Arial, Helvetica, sans-serif;
+  }
+  
+  .navbar {
+      background-color: #333;
+  }
+  
+  .left_div {
+      display:flex;
+      align-items: center;
+  }
+  
+  .right_div {
+      display: flex;
+      position: absolute;
+      right: 0;
+      top: 0;
+  }
+    
+  .logo {
+      float: left;
+      font-size: 50px;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      line-height: 45px;
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif ;
+	  cursor:pointer;
+  }
+  
+  #search {
+      float: left;
+      text-decoration: none;
+      font-size: 25px;
+      border-radius: 5px;
+  }
+  
+  #search_button{
+    position: relative;
+    left: 10px;
+    border-radius: 5px;
+    width: 60px;
+    height: 35px;
+    background-color: #333;
+    font-weight: bold;
+    border-color: #3dc905;
+    border-width: 3px;
+    color: #3dc905;
+	cursor:pointer;
+  }
+  
+    /* Links inside the navbar */
+    .right {
+      font-size: 20px;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      width: 60px;
+      height: 45px;
+      line-height: 45px;
+    }
+  
+    .right:hover {
+      background-color: rgb(129, 129, 129);
+    }
+  
+    .right_div .login_button {
+      font-size: 20px;
+      border: none;
+      outline: none;
+      color: white;
+      padding: 14px 16px;
+      background-color: inherit;
+      margin: 0;
+      line-height: 45px;
+    }
+	
+	.login_button {
+		cursor:pointer;
+	}
+  
+    .right_div .login_button:hover {
+      background-color: rgb(129, 129, 129);
+    }
+  
+    .regis_block {
+		background-color:white;
+		margin-top:30px;
+		padding:10px 5px 1px 5px;
+		border-style:ridge;
+		border-radius:10px 10px 10px 10px;
+	}
+	
+	.regis_headline {
+		border-radius:10px 10px 10px 10px;
+	}
+	
+	span {
+		font-size:20px;
+	}
+	
+	input {
+		padding: 3px 10px;
+		line-height: 28px;
+		border-radius:5px 5px 5px 5px;
+	}
+	
+	.welcome_pic {
+		width:auto;
+		overflow:hidden;
+	}

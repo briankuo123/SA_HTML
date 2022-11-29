@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EroPic</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <link href="statics/css/upload_post.css" rel="stylesheet">
+        <script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    </head>
+    <body style="margin:0px">
+        <div class="navbar">
+          <div class="left_div">
+            <a class="logo" href="index_login.html">EroPic</a>
+            <input type="search" id="search" aria-label="Search through site content" size="30">
+            <button id="search_button" type="submit" onclick="getSearch()">Search</button>
+          </div>
+          <div class="right_div">
+            <a class="right" href="sub.html"><img src="statics/icon/subscribe.png" width="50" height="45"></a>
+            <a class="right" href="rank"><img src="statics/icon/podium.png" width="50" height="45"></a>
+            <div class="dropdown">
+              <button class="dropbtn" id="nickname">
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <div class="dropdown-content">
+                <a href="personal_profile.html">Personal Profile</a>
+                <a href="post_manage.html">Post Manage</a>
+                <a href="javascript:void(0)" onclick="logout()">Logout</a>  
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="upload_post_table">
+            <div id="post_upload_title">
+                <input type="text" placeholder="Post title" id="post_title">
+            </div>
+            <div id="post_upload_picture">
+            </div>
+            <div id="post_content">
+                <textarea id="text_area" placeholder="Enter your content"></textarea>
+                <div id="content_button">
+                    <button type="button" onclick="updatePost()">Submit Edit</button>
+                </div>
+            </div>
+        </div>
+	</body>
+    <script>
+  		//取得網址參數
+	    var url_string = window.location.href;
+	    var url = new URL(url_string);
+	    var post_id = url.searchParams.get("post_id");
+	    var id = JSON.parse(sessionStorage.getItem("id"));
+
+        function getSearch() {
+        	var search_query = $("#search").val();
+        	document.location.href = "index_login.html?search_query=" + search_query;
+        }
+        
+        function getPostData() {
+  	  	  $.ajax({
+  	            type: "GET",
+  	            url: "api/Post.do",
+  	            data: "post_id=" + post_id,
+  	            crossDomain: true,
+  	            cache: false,
+  	            dataType: 'json',
+  	            timeout: 5000,
+  	            success: function (response) {
+  	                if(response.status == 200){
+  	              		updateHTML(response.response.data[0]);
+  	                }
+  	            },
+  	            error: function () {
+  	                alert("無法連線到伺服器！");
+  	            }
+  	      });
+  	    }
+  	    
+  	    function updateHTML(data) {
+  	    	var img_panel = '';
+  			img_panel += '<img class="center_img" id="img" src="' + data.image + '" width="400px" height="400px"><br>';
+  			
+  			$("#post_title").val(data.title);
+  			$("#post_upload_picture").append(img_panel);
+  			$("#text_area").html(data.description);
+  		}
+        
+        
+        function updatePost() {
+        	var title = document.getElementById('post_title').value;
+			var description = document.getElementById('text_area').value;
+			
+            // 將資料組成JSON格式
+            var data_object = {
+                "title": title,
+                "description": description,
+                "post_id": post_id
+            };
+
+            // 將JSON格式轉換成字串
+            var data_string = JSON.stringify(data_object);
+
+            // 發出POST的PUT請求
+            $.ajax({
+                    type: "PUT",
+                    url: "api/Post.do",
+                    data: data_string,
+                    crossDomain: true,
+                    cache: false,
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function (response) {
+                        if(response.status == 200){
+	                    	alert("已更新貼文");
+	                    	document.location.href = "post.html?post_id=" + post_id;
+                        }
+                    },
+                    error: function () {
+                        alert("無法連線到伺服器！");
+                    }
+            });
+        }
+        
+        function logout(){
+    	    sessionStorage.removeItem("id");
+    	    alert("成功登出！");
+    	    document.location.href = "index.html";
+        }
+        
+        function getMember() {
+            $.ajax({
+                type: "GET",
+                url: "api/member.do",
+                crossDomain: true,
+                data: "id=" + id,
+                cache: false,
+                dataType: 'json',
+                timeout: 5000,
+                success: function (response) {
+                    if(response.status == 200){
+                    	document.getElementById('nickname').innerHTML = response['response']['data'][0]['nickname'];
+                    }
+                    console.log(response);
+                },
+                error: function () {
+                    alert("無法連線到伺服器！");
+                }
+            });
+        }
+
+	    $(document).ready(function() {
+	    	// 發出GET的AJAX請求取得原本該會員的資料
+	        getMember();
+	    	getPostData();
+	    });
+    </script>
+</html>

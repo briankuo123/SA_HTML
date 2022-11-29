@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Management | EroPic</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <link href="statics/css/viewMember.css" rel="stylesheet">
+		<script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    </head>
+    <body style="margin:0px">
+        <div class="navbar">
+          <div class="left_div">
+            <a class="logo" href="index_manager.html">EroPic</a>
+            <input type="search" id="search" aria-label="Search through site content" size="30">
+            <button id="search_button" type="submit" onclick="getSearch()">Search</button>
+          </div>
+          <div class="right_div">
+            <a class="right" href="sub_manager.html"><img src="statics/icon/subscribe.png" width="50" height="45"></a>
+            <a class="right" href="rank"><img src="statics/icon/podium.png" width="50" height="45"></a>
+            <div class="dropdown">
+              <button class="dropbtn" id="nickname">
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <div class="dropdown-content">
+                <a href="personal_profile_manager.html">Personal Profile</a>
+                <a href="post_manage_manager.html">Post Manage</a>
+                <a href="viewMember.html">View Member</a>
+                <a href="viewReport.html">View Report</a>
+                <a href="javascript:void(0)" onclick="logout()">Logout</a> 
+              </div>
+            </div>
+          </div>
+        </div>
+		<div id="all">
+			<div id="table_up_area">
+				<button type="button" onclick="getAllMember(1)">Manager</button>
+				<button type="button" onclick="getAllMember(0)">Member</button>
+				<input type="search" placeholder="ID, Name, Email">
+				<button id="people_search" type="submit"><img src="statics/icon/searchIcon.png" width="30px" height="30px"></button>
+			</div>
+		
+			<div class="table_div">
+				<table id="account_table" bgcolor="white" cellspacing="0" width="100%">
+					<thead>
+						<tr bgcolor="#333" style="color:white" align="center">
+							<th width="10%" class="sort">會員ID</th>
+							<th width="15%" class="sort">使用者名稱</th>
+							<th width="30%" class="sort">Email</th>
+							<th width="30%" class="sort">建立時間</th>
+							<th width="15%"></th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+			
+			<div id="table_foot">
+			</div>
+		</div>
+	</body>
+	<script>
+		var id = JSON.parse(sessionStorage.getItem("id"));
+	
+		function getSearch() {
+		  	var search_query = $("#search").val();
+		  	document.location.href = "index_manager.html?search_query=" + search_query;
+		}
+		
+	    function getAllMember(isAdmin) {
+	      $.ajax({
+	        type: "GET",
+	        url: "api/member.do",
+	        crossDomain: true,
+	        data: "isAdmin=" + isAdmin,
+	        cache: false,
+	        dataType: 'json',
+	        timeout: 5000,
+	        success: function (response) {
+	          if (response.status == 200) {
+	  	    	$("#account_table > tbody").empty();
+	  	    	$("#table_foot").empty();
+	        	var member_panel = '';
+	        	
+	        	$.each(response.response.data, function (){
+	        		member_panel += addMember(this);
+	        	})
+	        	
+	        	$("#account_table > tbody").append(member_panel);
+	        	$("#table_foot").append(addMemberFoot());
+	          }
+	        },
+	        error: function () {
+	          alert("無法連線到伺服器！");
+	        }
+	      });
+	    }
+	    
+	    function addMember(data) {
+	    	let inner_html = '';
+	    	
+	    	inner_html += '<tr align="center">';
+	   		inner_html += '<td width="10%">' + data.id + '</td>';
+	   		inner_html += '<td width="15%">' + data.nickname + '</td>';
+	 		inner_html += '<td width="30%">' + data.email + '</td>';
+	 		inner_html += '<td width="30%">' + data.created + '</td>';
+	 		inner_html += '<td width="15%"><button onclick="deleteMember(' + data.id + ')">Delete</button></td>';
+			inner_html += '</tr>';
+	    	
+			return inner_html;
+	    }
+	    
+	    function addMemberFoot() {
+            let inner_html='';
+            
+            inner_html += '<br><h3 align="center">無更多資料...</h3><br>';
+            
+            return inner_html;
+        }
+	    
+	    function deleteMember(id) {
+            var check = window.confirm("確認刪除會員？");
+            if (check == true) {
+                console.log("You pressed OK!");
+                var request = {'id': id};
+                var data_string = JSON.stringify(request);
+                $.ajax({
+                    type: "DELETE",
+                    url: "api/member.do",
+                    crossDomain: true,
+                    data: data_string,
+                    cache: false,
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function (response) {
+                        if(response.status == 200){
+                        	alert("成功刪除會員！");
+                            getAllMember();
+                        }
+                    },
+                    error: function () {
+                        alert("無法連線到伺服器！");
+                    }
+                });
+            }
+            else {
+                console.log("You pressed Cancel!");
+            }
+        }
+	    
+
+		function logout(){
+		   sessionStorage.removeItem("id");
+		   alert("成功登出！");
+		   document.location.href = "index.html";
+		}
+		  
+		function getMember() {
+		    $.ajax({
+		        type: "GET",
+		        url: "api/member.do",
+		        crossDomain: true,
+		        data: "id=" + id,
+		        cache: false,
+		        dataType: 'json',
+		        timeout: 5000,
+		        success: function (response) {
+		            if(response.status == 200){
+		            	document.getElementById('nickname').innerHTML = response['response']['data'][0]['nickname'];
+		            }
+				    getAllMember(0);
+		            console.log(response);
+		        },
+		        error: function () {
+		            alert("無法連線到伺服器！");
+		        }
+		    });
+		}
+		
+		$(document).ready(function() {
+			// 發出GET的AJAX請求取得原本該會員的資料
+		    getMember();
+		});
+    </script>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EroPic</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <link href="statics/css/sub.css" rel="stylesheet">
+    	<script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    </head>
+    <body style="margin:0px">
+        <div class="navbar">
+          <div class="left_div">
+            <a class="logo" href="index_login.html">EroPic</a>
+            <input type="search" id="search" aria-label="Search through site content" size="30">
+            <button id="search_button" type="submit" onclick="getSearch()">Search</button>
+          </div>
+          <div class="right_div">
+            <a class="right" href="sub.html"><img src="statics/icon/subscribe.png" width="50" height="45"></a>
+            <a class="right" href="rank"><img src="statics/icon/podium.png" width="50" height="45"></a>
+            <div class="dropdown">
+              <button class="dropbtn" id="nickname">
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <div class="dropdown-content">
+                <a href="personal_profile.html">Personal Profile</a>
+                <a href="post_manage.html">Post Manage</a>
+                <a href="javascript:void(0)" onclick="logout()">Logout</a>  
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="sub_area">
+            <table id="sub_table">
+                <thead>
+                    <tr>
+                        <th width="85%" align="left">Followed Members</th>
+                        <th width="15%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <div id="sub_foot">
+            </div>
+        </div>
+	</body>
+    <script>
+        var id = JSON.parse(sessionStorage.getItem("id"));
+		
+        function getSearch() {
+        	var search_query = $("#search").val();
+        	document.location.href = "index_login.html?search_query=" + search_query;
+        }
+        
+        function logout(){
+    	    sessionStorage.removeItem("id");
+    	    alert("成功登出！");
+    	    document.location.href = "index.html";
+        }
+
+        function getAllFollower() {
+            $.ajax({
+              type: "GET",
+              url: "api/follower.do",
+              crossDomain: true,
+              data: "id="+id,
+              cache: false,
+              dataType: 'json',
+              timeout: 5000,
+              success: function (response) {
+                if (response.status == 200) {
+	            var follower_panel = '';
+		            $("#sub_table > tbody").empty();
+		            $("#sub_foot").empty();
+		              	
+		            $.each(response.response.data, function() {
+		            	follower_panel += addSub(this);
+		            })
+		              	
+		            $("#sub_table > tbody").append(follower_panel);
+		            $("#sub_foot").append(addSubFoot());
+                }
+              },
+              error: function () {
+                alert("無法連線到伺服器！");
+              }
+           });
+        }
+        
+        //加進tbody
+        function addSub(data) {
+            let inner_html='';
+            
+            inner_html += '<tr>';
+            inner_html += '<td width="85%">' + data.nickname + '</td>';
+            inner_html += '<td width="15%"><button onclick="unfollow(' + data.follower_id + ')">Unfollow</button></td>';
+            inner_html += '</tr>';
+            
+            return inner_html;
+        }
+        
+        function addSubFoot() {
+            let inner_html='';
+            
+            inner_html += '<br><h3 align="center">無更多資料...</h3><br>';
+            
+            return inner_html;
+        }
+        
+        function unfollow(follower_id) {
+            var check = window.confirm("確認取消追蹤帳號？");
+            if (check == true) {
+                console.log("You pressed OK!");
+                var request = {'member_id': id, "follower_id": follower_id};
+                var data_string = JSON.stringify(request);
+                $.ajax({
+                    type: "DELETE",
+                    url: "api/follower.do",
+                    crossDomain: true,
+                    data: data_string,
+                    cache: false,
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function (response) {
+                        if(response.status == 200){
+                        	alert("已取消追蹤！");
+                        	getAllFollower();
+                        }
+                    },
+                    error: function () {
+                        alert("無法連線到伺服器！");
+                    }
+                });
+            }
+            else {
+                console.log("You pressed Cancel!");
+            }
+        }
+        
+        function getMember() {
+            $.ajax({
+                type: "GET",
+                url: "api/member.do",
+                crossDomain: true,
+                data: "id=" + id,
+                cache: false,
+                dataType: 'json',
+                timeout: 5000,
+                success: function (response) {
+                    if(response.status == 200){
+                    	document.getElementById('nickname').innerHTML = response['response']['data'][0]['nickname'];
+                    }
+                    getAllFollower();
+                    console.log(response);
+                },
+                error: function () {
+                    alert("無法連線到伺服器！");
+                }
+            });
+        }
+        
+        $(document).ready(function() {
+        	// 發出GET的AJAX請求取得原本該會員的資料
+            getMember();
+        });
+
+    </script>
+</html>

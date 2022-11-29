@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EroPic</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <link href="statics/css/index_login.css" rel="stylesheet">
+        <script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    </head>
+    <body style="margin:0px">
+        <div class="navbar">
+          <div class="left_div">
+            <a class="logo" href="index.html">EroPic</a>
+            <input type="search" id="search" aria-label="Search through site content" size="30">
+            <button id="search_button" type="submit" onclick="getSearch()">Search</button>
+          </div>
+          <div class="right_div">
+            <a class="right" onclick="not_login()"><img src="statics/icon/subscribe.png" width="50" height="45"></a>
+            <a class="right" onclick="not_login()"><img src="statics/icon/podium.png" width="50" height="45"></a>
+            <div class="dropdown">
+            <a href="login_page.html">
+              <button class="dropbtn">Login</button>
+            </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="post_area" id="post_area">
+        </div>
+    </body>
+  <script>
+	var url_string = window.location.href;
+  	var url = new URL(url_string);
+  	var search_query = url.searchParams.get("search_query");
+  	
+  	function getSearch() {
+    	var search_query = $("#search").val();
+    	document.location.href = "index.html?search_query=" + search_query;
+    }
+  	
+    function not_login() {
+        alert("你必須要登入才能使用這個功能！");
+    }
+	
+    function getAllPost() {
+        $.ajax({
+          type: "GET",
+          url: "api/Post.do",
+          crossDomain: true,
+          cache: false,
+          data: "search_query="+ search_query,
+          dataType: 'json',
+          timeout: 5000,
+          success: function (response) {
+            if (response.status == 200) {
+	          	var post_panel = '';
+	          	
+	          	$.each(response.response.data, function() {
+	          		post_panel += addPost(this);
+	          	})
+	          	
+	          	$("#post_area").append(post_panel);
+	          	$("#post_area").append(addEndPost());
+            }
+          },
+          error: function () {
+            alert("無法連線到伺服器！");
+          }
+       });
+    }
+    
+    function addPost (data) {
+        let inner_html = '';
+        
+    	inner_html += '<div class="post_box">';
+   		inner_html += '<a href="post_not_login.html?post_id=' + data.id + '" id="img_a"><img src=' + data.image + ' width="300px" height="300px"></a>';
+   		inner_html += '<a href="post_not_login.html?post_id=' + data.id + '">' + data.title + '</a><p>';
+        inner_html += '<div id="post_tag">'
+       	for (var i = 0 ; i < data.tagList.length ; i++){
+     		inner_html += '<a id="tag" href="index.html?search_query=' + data.tagList[i] +' ">' + "#" + data.tagList[i] + ' </a>'
+     	}
+        inner_html += '</div>'
+ 		inner_html += '<a class="info">Post By : ' + data.creator + '&nbsp; &nbsp;</a><p>';
+ 		inner_html += '<a class="info">' + data.create + '</a>';
+ 		inner_html += '<div class="button">';
+ 		inner_html += '<button type="button" id="like_button" onclick="not_login()"><img class="like_icon" id="like_' + data.id + '" alt="0" src="statics/icon/like.png" onclick="icon_like_change(' + data.id + ')"></button>';
+      	inner_html += '<a id="like_counter">' + data.like + '</a>';
+		inner_html += '<button type="button" id="star_button" onclick="not_login()"><img class="star_icon" id="star_' + data.id + '" alt="0" src="statics/icon/star.png" onclick="icon_star_change(' + data.id + ')"></button>';
+		inner_html += '<button type="button" onclick="gotoPostComment(' + data.id + ')"><img src="statics/icon/comment.png"></button>';
+		inner_html += '<button type="button" onclick="not_login()"><img src="statics/icon/no-entry.png"></button>';
+		inner_html += '</div>';
+		inner_html += '</div>';
+    	
+		return inner_html;
+    }
+    
+    function addEndPost() {
+        let inner_html = '';
+        
+    	inner_html += '<div class="post_box">';
+   		inner_html += '<a id="img_a"><img src="statics/img/noMorePost.jpg" width="300px" height="420px"></a>';
+		inner_html += '</div>';
+    	
+		return inner_html;
+    }
+    
+    function gotoPostComment(post_id) {
+    	document.location.href = "post_not_login.html?post_id=" + post_id + "#post_comment";
+    }
+    
+    $(document).ready(function() {
+	    getAllPost();
+	    document.getElementById('search').value = search_query;
+    });
+  </script>
+</html>

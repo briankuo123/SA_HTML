@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EroPic</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <link href="statics/css/post.css" rel="stylesheet">
+        <script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    </head>
+    <body style="margin:0px">
+        <div class="navbar">
+          <div class="left_div">
+            <a class="logo" href="index.html">EroPic</a>
+            <input type="search" id="search" aria-label="Search through site content" size="30">
+            <button id="search_button" type="submit" onclick="getSearch()">Search</button>
+          </div>
+          <div class="right_div">
+            <a class="right" href="" onclick="not_login()"><img src="statics/icon/subscribe.png" width="50" height="45"></a>
+            <a class="right" href="" onclick="not_login()"><img src="statics/icon/podium.png" width="50" height="45"></a>
+            <div class="dropdown">
+              <button class="dropbtn">Login
+                <i class="fa fa-caret-down"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div id="post_info_area">
+            
+        </div>
+    </body>
+    <script>
+	    var url_string = window.location.href;
+	    var url = new URL(url_string);
+	    var post_id = url.searchParams.get("post_id");
+	    var id = JSON.parse(sessionStorage.getItem("id"));
+	    
+        function not_login() {
+            alert("You will have to login to use the following function");
+        }
+	    
+        function getSearch() {
+	    	var search_query = $("#search").val();
+	    	document.location.href = "index_login.html?search_query=" + search_query;
+	    }
+	    
+	    function getPostData() {
+	  	  $.ajax({
+	            type: "GET",
+	            url: "api/Post.do",
+	            data: "post_id=" + post_id,
+	            crossDomain: true,
+	            cache: false,
+	            dataType: 'json',
+	            timeout: 5000,
+	            success: function (response) {
+	                if(response.status == 200){
+	                	$("#post_info_area").empty();
+	                	post_panel = updateHTML(response.response.data[0]);
+	              		
+	              		$("#post_info_area").append(post_panel);
+	        	        getAllComment();
+	                }
+	            },
+	            error: function () {
+	                alert("無法連線到伺服器！");
+	            }
+	      });
+	    }
+    
+	    function updateHTML(data) {
+	    	var inner_html = '';
+			
+			inner_html += '<h1 id="post_title">' + data.title + '</h1>';
+			inner_html += '<div id="post_picture">';
+			inner_html += '<img class="center_img" id="center_img" src="' + data.image + '" width="400px" height="400px">';
+			inner_html += '</div>';
+			inner_html += '<div id="post_content">';
+			inner_html += '<a id="post_creator">Post By: ' + data.creator + '&nbsp; &nbsp;</a>';
+			inner_html += '<a id="post_time">' + data.create + '</a>';
+			inner_html += '<div id="post_button">';
+			inner_html += '<button type="button" id="like_button">';
+			inner_html += '<img class="like_icon" id="like_' + data.id + '" alt="0" src="statics/icon/like.png" onclick="not_login()"></button>';
+			inner_html += '<a id="like_counter">' + data.like + '</a>';
+			inner_html += '<button type="button" id="star_button">';
+			inner_html += '<img class="star_icon" id="star_' + data.id + '" alt="0" src="statics/icon/star.png" onclick="not_login()"></button>';
+			inner_html += '<button type="button" onclick="window.location.href=\'#text_area\'">';
+			inner_html += '<img src="statics/icon/comment.png"></button>';
+			inner_html += '<button type="button" onclick="not_login()"><img src="statics/icon/no-entry.png"></button>';
+			inner_html += '</div><hr><h3 id="post_description">' + data.description + '<br><br><br></h3><hr>';
+			inner_html += '<div id="post_comment">';
+			inner_html += '<br></div>';
+			inner_html += '<div id="all_comment"><h3>All Comments</h3><hr><div id="comment_area"></div></div></div>';
+			
+			return inner_html;
+		}
+	    
+	    function getAllComment() {
+	        $.ajax({
+	          type: "GET",
+	          url: "api/comment.do",
+	          crossDomain: true,
+	          data: "post_id=" + post_id,
+	          cache: false,
+	          dataType: 'json',
+	          timeout: 5000,
+	          success: function (response) {
+	            if (response.status == 200) {
+	            	$("#comment_area").empty();
+		          	var comment_panel = '';
+		          	
+		          	$.each(response.response.data, function() {
+		          		comment_panel += addComment(this);
+		          	})
+		          	
+		          	$("#comment_area").append(comment_panel);
+		          	$("#comment_area").append(addCommentFoot());
+		          	console.log(response.response);
+	            }
+	          },
+	          error: function () {
+	            alert("無法連線到伺服器！");
+	          }
+	       });
+	    }
+	    
+	    function addComment(data) {
+	        let inner_html = '';
+	        
+	    	inner_html += '<div class="comment_style">';
+	   		inner_html += '<a><b>'+ data.member_nickname +'</b></a>';
+	   		inner_html += '<a class="comment_time">' + data.created + '</a><br>';
+	        inner_html += '<a class="comment_content">'+ data.comment +'</a><br>';
+			if (data.member_id == id){
+				inner_html += '<button type="button" class="comment_button_delete" onclick="deleteComment(' + data.id + ')">Delete</button>';
+			}
+			inner_html += '</div>';
+	    	
+			return inner_html;
+	    }
+	    
+	    function addCommentFoot() {
+	        let inner_html = '';
+	        
+	        inner_html += '<br><h3 align="center">無更多留言...</h3><br>';
+	    	
+			return inner_html;
+	    }
+
+	    $(document).ready(function() {
+	        getPostData();
+	    });
+    </script>
+</html>

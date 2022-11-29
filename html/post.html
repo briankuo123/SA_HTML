@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EroPic</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        
+        <link href="statics/css/post.css" rel="stylesheet">
+        <script src="statics/js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+    </head>
+    <body style="margin:0px">
+        <div class="navbar">
+          <div class="left_div">
+            <a class="logo" href="index_login.html">EroPic</a>
+            <input type="search" id="search" aria-label="Search through site content" size="30">
+            <button id="search_button" type="submit" onclick="getSearch()">Search</button>
+          </div>
+          <div class="right_div">
+            <a class="right" href="sub.html"><img src="statics/icon/subscribe.png" width="50" height="45"></a>
+            <a class="right" href="rank"><img src="statics/icon/podium.png" width="50" height="45"></a>
+            <div class="dropdown">
+              <button class="dropbtn" id="nickname">
+                <i class="fa fa-caret-down"></i>
+              </button>
+              <div class="dropdown-content">
+                <a href="personal_profile.html">Personal Profile</a>
+                <a href="post_manage.html">Post Manage</a>
+                <a href="javascript:void(0)" onclick="logout()">Logout</a>  
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="report_table">
+          <h2><b>請選擇檢舉原因</b></h2>
+          <p class="p_margin">
+              <input type="checkbox" id="checkbox_1" name="checkbox" onclick="onlyOne(this)">
+              <label for="checkbox_1" id="label_1">暴力內容</label>
+          </p>
+          <p class="p_margin">
+              <input type="checkbox" id="checkbox_2" name="checkbox" onclick="onlyOne(this)">
+              <label for="checkbox_2" id="label_2">詐騙或誤導內容</label>
+          </p>
+          <p class="p_margin">
+              <input type="checkbox" id="checkbox_3" name="checkbox" onclick="onlyOne(this)">
+              <label for="checkbox_3" id="label_3">性敏感的內容</label>
+          </p>
+          <p class="p_margin">
+              <input type="checkbox" id="checkbox_4" name="checkbox" onclick="onlyOne(this)">
+              <label for="checkbox_4" id="label_4">仇恨性的內容</label>
+          </p>
+          <p class="p_margin">
+              <input type="checkbox" id="checkbox_5" name="checkbox" onclick="onlyOne(this)">
+              <label for="checkbox_5" id="label_5">隱含霸凌的內容</label>
+          </p>
+          <p class="p_margin">
+              <input type="checkbox" id="checkbox_6" name="checkbox" onclick="onlyOne(this)">
+              <label for="checkbox_6" id="label_6">這是孫有年的貼文</label>
+          </p>
+          <br>
+          <div id="report_table_div">
+              <button type="button" class="report_table_button" onclick="report_cancel()">Cancel</button>
+              <button type="button" class="report_table_button" onclick="report_submit()">Submit</button>
+          </div>
+      </div>
+      <div id="report_table_2">
+          <p class="p_margin"><b>已收到您提交的內容，我們將盡速處理</b></p>
+          <div id="report_table_div_2">
+              <button type="button" onclick="close_report_table()">OK</button>
+          </div>
+      </div>
+      <div id="post_info_area">
+          
+      </div>
+    </body>
+    <script>
+	  	//取得網址參數
+	    var url_string = window.location.href;
+	    var url = new URL(url_string);
+	    var post_id = url.searchParams.get("post_id");
+	    var id = JSON.parse(sessionStorage.getItem("id"));
+	    var report_post_id = 0;
+	    var like_post_id = 0;
+	    var star_post_id = 0;
+	    
+	    function getSearch() {
+	    	var search_query = $("#search").val();
+	    	document.location.href = "index_login.html?search_query=" + search_query;
+	    }
+	    
+	    function getPostData() {
+	  	  $.ajax({
+	            type: "GET",
+	            url: "api/Post.do",
+	            data: "post_id=" + post_id,
+	            crossDomain: true,
+	            cache: false,
+	            dataType: 'json',
+	            timeout: 5000,
+	            success: function (response) {
+	                if(response.status == 200){
+	                	$("#post_info_area").empty();
+	                	post_panel = updateHTML(response.response.data[0]);
+	              		
+	              		$("#post_info_area").append(post_panel);
+	        	        getAllComment();
+	                }
+	            },
+	            error: function () {
+	                alert("無法連線到伺服器！");
+	            }
+	      });
+	    }
+    
+	    function updateHTML(data) {
+	    	var inner_html = '';
+			
+			inner_html += '<h1 id="post_title">' + data.title + '</h1>';
+			inner_html += '<div id="post_picture">';
+			inner_html += '<img class="center_img" id="center_img" src="' + data.image + '" width="400px" height="400px">';
+			inner_html += '</div>';
+			inner_html += '<div id="post_content">';
+			inner_html += '<a id="post_creator">Post By: ' + data.creator + '&nbsp; &nbsp;</a>';
+			inner_html += '<a id="post_time">' + data.create + '</a>';
+			inner_html += '<div id="post_button">';
+			inner_html += '<button type="button" id="like_button">';
+			inner_html += '<img class="like_icon" id="like_' + data.id + '" alt="0" src="statics/icon/like.png" onclick="icon_like_change(' + data.id + ')"></button>';
+			inner_html += '<a id="like_counter">' + data.like + '</a>';
+			inner_html += '<button type="button" id="star_button">';
+			inner_html += '<img class="star_icon" id="star_' + data.id + '" alt="0" src="statics/icon/star.png" onclick="icon_star_change(' + data.id + ',' + data.creator_id + ')"></button>';
+			inner_html += '<button type="button" onclick="window.location.href=\'#text_area\'">';
+			inner_html += '<img src="statics/icon/comment.png"></button>';
+			inner_html += '<button type="button" onclick="show_report_table()"><img src="statics/icon/no-entry.png"></button>';
+			inner_html += '</div><hr><h3 id="post_description">' + data.description + '<br><br><br></h3><hr>';
+			inner_html += '<div id="post_comment">';
+			inner_html += '<textarea id="text_area" placeholder="Comment"></textarea>';
+			inner_html += '<div id="comment_button">';
+			inner_html += '<button type="button" onclick="clear_textarea()">Cancel</button>';
+			inner_html += '<button type="button" onclick="submit_comment()">Submit</button></div><br></div>';
+			inner_html += '<div id="all_comment"><h3>All Comments</h3><hr><div id="comment_area"></div></div></div>';
+			
+			return inner_html;
+		}
+
+	    function icon_like_change(post_id) {
+		    like_post_id = post_id;
+		    var color_state = document.getElementById("like_"+like_post_id).alt;
+		    if(color_state==0) {
+		      document.getElementById("like_"+like_post_id).alt="1";
+		      document.getElementById("like_"+like_post_id).src="statics/icon/like_fill.png";
+		      addLike(like_post_id);
+		    }
+		    else if(color_state==1) {
+		      document.getElementById("like_"+like_post_id).alt="0";
+		      document.getElementById("like_"+like_post_id).src="statics/icon/like.png";
+		    }
+	    }
+	    
+	    function icon_star_change(post_id, creator_id){
+		    star_creator_id = creator_id;
+		    var star_state = document.getElementById("star_"+post_id).alt;
+		    if(star_state==0) {
+		      document.getElementById("star_"+post_id).alt="1";
+		      document.getElementById("star_"+post_id).src="statics/icon/star_fill.png";
+		      addStar(star_creator_id);
+		    }
+		    else if(star_state==1) {
+		      document.getElementById("star_"+post_id).alt="0";
+		      document.getElementById("star_"+post_id).src="statics/icon/star.png";
+		    }
+	    }
+
+	    function show_report_table(id) {
+		    document.getElementById("report_table").style.visibility="visible";
+		    report_post_id = id;
+	    }
+
+	    function onlyOne(checkbox) {
+		    var checkboxes = document.getElementsByName('checkbox')
+		    checkboxes.forEach((item) => { if (item !== checkbox) item.checked = false});
+	    }
+	    
+	    function report_cancel() {
+		    var checkboxes = document.getElementsByName('checkbox');
+		    document.getElementById("report_table").style.visibility="hidden";
+		    checkboxes.forEach((item) => { item.checked = false });
+	    }
+
+	    function report_submit() {
+		    var checkboxes = document.getElementsByName('checkbox');
+		    var counter = 0;
+		    checkboxes.forEach((item) => { if(item.checked == true) counter = 1});
+		    if(counter == 1) {
+		        document.getElementById("report_table").style.visibility="hidden";
+		        for(var i = 1; i <= checkboxes.length; i++){
+		        	if(checkboxes[i-1].checked){
+		        		var report_reason = document.getElementById("label_"+i).textContent;
+		        	}
+		        	checkboxes[i-1].checked = false;
+		        }
+		        submit(report_reason);
+		    }
+		    else {
+		        alert("You haven't selected a reason, please check again.")
+		    }
+	    }
+
+	    function close_report_table() {
+	    	document.getElementById("report_table_2").style.visibility="hidden";
+	    }
+
+	    function submit(report_reason) {
+	    	
+			var data_object = {
+				"reporter_id" : id,
+				"report_post_id" : post_id,
+				"report_reason" : report_reason
+			};
+
+			// 將JSON格式轉換成字串
+			var data_string = JSON.stringify(data_object);
+			
+			// 發出POST的AJAX請求
+			$.ajax({
+				type : "POST",
+				url : "api/report.do",
+				data : data_string,
+				crossDomain : true,
+				cache : false,
+				dataType : 'json',
+				timeout : 5000,
+				success : function(response) {
+					if (response.status == 200) {
+				        document.getElementById("report_table_2").style.visibility="visible";
+					}
+					else if (response.status == 400) {
+						alert(response.message);
+					}
+				},
+				error : function() {
+					alert("無法連線到伺服器！");
+				}
+			});
+		}
+	    
+
+	    function addLike(post_id) {
+	        
+	        // 將資料組成JSON格式
+	        var data_object = {
+	        	"title" : "",
+	        	"description" : "",
+	            "post_id" : post_id
+	        };
+	
+	        // 將JSON格式轉換成字串
+	        var data_string = JSON.stringify(data_object);
+	
+	        // 發出POST的PUT請求
+	        $.ajax({
+	                type: "PUT",
+	                url: "api/Post.do",
+	                data: data_string,
+	                crossDomain: true,
+	                cache: false,
+	                dataType: 'json',
+	                timeout: 5000,
+	                success: function (response) {
+	                    if(response.status == 200){
+	                    	getPostData();
+	                    }
+	                },
+	                error: function () {
+	                    alert("無法連線到伺服器！");
+	                }
+	        });
+	    }
+	    
+	    function addStar(creator_id) {
+	    	
+	    	var data_object = {
+	    			"id" : id,
+	    			"creator_id" : creator_id
+	    		};
+	
+	    		// 將JSON格式轉換成字串
+	    		var data_string = JSON.stringify(data_object);
+	    		
+	    		// 發出POST的AJAX請求
+	    		$.ajax({
+	    			type : "POST",
+	    			url : "api/follower.do",
+	    			data : data_string,
+	    			crossDomain : true,
+	    			cache : false,
+	    			dataType : 'json',
+	    			timeout : 5000,
+	    			success : function(response) {
+	    				if (response.status == 200) {
+	    					alert("成功加入關注列表！");
+	    				}
+	    				else if (response.status == 400) {
+	    					alert(response.message);
+	    				}
+	    			},
+	    			error : function() {
+	    				alert("無法連線到伺服器！");
+	    			}
+	    		});
+	    }
+	    
+	    function clear_textarea() {
+	    	document.getElementById('text_area').value = "";
+	    }
+	    
+	    function submit_comment() {
+			var comment = document.getElementById('text_area').value;
+			
+			var data_object = {
+				"member_id" : id,
+				"post_id" : post_id,
+				"comment" : comment
+			};
+
+			// 將JSON格式轉換成字串
+			var data_string = JSON.stringify(data_object);
+			
+			// 發出POST的AJAX請求
+			$.ajax({
+				type : "POST",
+				url : "api/comment.do",
+				data : data_string,
+				crossDomain : true,
+				cache : false,
+				dataType : 'json',
+				timeout : 5000,
+				success : function(response) {
+					if (response.status == 200) {
+						alert("留言成功！");
+						getAllComment();
+					}
+					else if (response.status == 400) {
+						alert(response.message);
+					}
+				},
+				error : function() {
+					alert("無法連線到伺服器！");
+				}
+			});
+			
+			clear_textarea();
+		}
+	    
+	    function getAllComment() {
+	        $.ajax({
+	          type: "GET",
+	          url: "api/comment.do",
+	          crossDomain: true,
+	          data: "post_id=" + post_id,
+	          cache: false,
+	          dataType: 'json',
+	          timeout: 5000,
+	          success: function (response) {
+	            if (response.status == 200) {
+	            	$("#comment_area").empty();
+		          	var comment_panel = '';
+		          	
+		          	$.each(response.response.data, function() {
+		          		comment_panel += addComment(this);
+		          	})
+		          	
+		          	$("#comment_area").append(comment_panel);
+		          	$("#comment_area").append(addCommentFoot());
+		          	console.log(response.response);
+	            }
+	          },
+	          error: function () {
+	            alert("無法連線到伺服器！");
+	          }
+	       });
+	    }
+	    
+	    function addComment(data) {
+	        let inner_html = '';
+	        
+	    	inner_html += '<div class="comment_style">';
+	   		inner_html += '<a><b>'+ data.member_nickname +'</b></a>';
+	   		inner_html += '<a class="comment_time">' + data.created + '</a><br><br>';
+	        inner_html += '<a class="comment_content">'+ data.comment +'</a>';
+			if (data.member_id == id){
+				inner_html += '<button type="button" class="comment_button_delete" onclick="deleteComment(' + data.id + ')">Delete</button>';
+			}
+			inner_html += '</div>';
+	    	
+			return inner_html;
+	    }
+	    
+	    function addCommentFoot() {
+	        let inner_html = '';
+	        
+	        inner_html += '<br><h3 align="center">無更多留言...</h3><br>';
+	    	
+			return inner_html;
+	    }
+	    
+	    function deleteComment(comment_id) {
+	    	var check = window.confirm("確認刪除留言？");
+            if (check == true) {
+                console.log("You pressed OK!");
+                var request = {'id': comment_id};
+                var data_string = JSON.stringify(request);
+                $.ajax({
+                    type: "DELETE",
+                    url: "api/comment.do",
+                    crossDomain: true,
+                    data: data_string,
+                    cache: false,
+                    dataType: 'json',
+                    timeout: 5000,
+                    success: function (response) {
+                        if(response.status == 200){
+                        	alert("成功刪除留言！");
+                        	getAllComment();
+                        }
+                    },
+                    error: function () {
+                        alert("無法連線到伺服器！");
+                    }
+                });
+            }
+            else {
+                console.log("You pressed Cancel!");
+            }
+	    }
+	    
+	    function logout() {
+		    sessionStorage.removeItem("id");
+		    alert("成功登出！");
+		    document.location.href = "index.html";
+	    }
+	    
+	    function getMember() {
+	        $.ajax({
+	            type: "GET",
+	            url: "api/member.do",
+	            crossDomain: true,
+	            data: "id=" + id,
+	            cache: false,
+	            dataType: 'json',
+	            timeout: 5000,
+	            success: function (response) {
+	                if(response.status == 200){
+	                	document.getElementById('nickname').innerHTML = response['response']['data'][0]['nickname'];
+	                }
+	                console.log(response);
+	            },
+	            error: function () {
+	                alert("無法連線到伺服器！");
+	            }
+	        });
+	    }
+	    
+	    $(document).ready(function() {
+	    	// 發出GET的AJAX請求取得原本該會員的資料
+	        getMember();
+	        getPostData();
+	    });
+
+    </script>
+</html>

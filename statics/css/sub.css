@@ -1,0 +1,138 @@
+body {
+    font-family:Arial, Helvetica, sans-serif;
+  }
+  
+  .navbar {
+      background-color: #333;
+  }
+  
+  .left_div {
+      display:flex;
+      align-items: center;
+  }
+  
+  .right_div {
+      display: flex;
+      position: absolute;
+      right: 0;
+      top: 0;
+  }
+    
+  .logo {
+      float: left;
+      font-size: 50px;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      line-height: 45px;
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif ;
+  }
+  
+  #search {
+      float: left;
+      text-decoration: none;
+      font-size: 25px;
+      border-radius: 5px;
+  }
+  
+  #search_button{
+    position: relative;
+    left: 10px;
+    border-radius: 5px;
+    width: 60px;
+    height: 35px;
+    background-color: #333;
+    font-weight: bold;
+    border-color: #3dc905;
+    border-width: 3px;
+    color: #3dc905;
+  }
+  
+    /* Links inside the navbar */
+    .right {
+      font-size: 20px;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+      width: 60px;
+      height: 45px;
+      line-height: 45px;
+    }
+  
+    .right:hover {
+      background-color: rgb(129, 129, 129);
+    }
+  
+    .right_div .dropbtn {
+      font-size: 20px;
+      border: none;
+      outline: none;
+      color: white;
+      padding: 14px 16px;
+      background-color: inherit;
+      margin: 0;
+      line-height: 45px;
+      width: 140px;
+    }
+  
+    .right_div .dropbtn:hover {
+      background-color: rgb(129, 129, 129);
+    }
+  
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+  
+    .dropdown-content a {
+      float: none;
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      text-align: left;
+    }
+  
+    .dropdown-content a:hover {
+      background-color: #ddd;
+    }
+  
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    #sub_table {
+      margin: 10px 30%;
+      width: 40%;
+    }
+
+    #sub_table th {
+      font-size: 25px;
+    }
+
+    #sub_table td {
+        font-size:  16px;
+    }
+
+    #sub_table tr {
+        height: 40px;
+    }
+
+    #sub_table button {
+      border: none;
+      width: 80px;
+      height: 30px;
+      margin: 0px;
+      padding: 0px;
+      border-radius: 5px;
+    }
+
+    #sub_table button:hover {
+      background-color: rgba(54, 54, 54, 0.2);
+    }
